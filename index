@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jadwal Servis Motor 🛵</title>
+    <!-- Tailwind CSS untuk styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts untuk font yang ceria -->
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Konfigurasi Tailwind untuk tema warna ceria -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Quicksand', 'sans-serif'],
+                    },
+                    colors: {
+                        'ceria-pink': '#FF6B6B',
+                        'ceria-yellow': '#FFD93D',
+                        'ceria-blue': '#4D96FF',
+                        'ceria-green': '#6BCB77',
+                        'ceria-bg': '#FFF8E5'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Animasi sederhana untuk elemen yang muncul */
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Styling untuk scrollbar agar lebih manis */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #FFD93D; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #FF6B6B; }
+    </style>
+</head>
+<body class="bg-ceria-bg text-gray-800 min-h-screen p-4 sm:p-8">
+
+    <div class="max-w-3xl mx-auto">
+        <!-- Header -->
+        <header class="text-center mb-8 fade-in">
+            <h1 class="text-4xl font-bold text-ceria-pink mb-2 tracking-wide drop-shadow-sm">
+                🛵 Jadwal Servis Motor
+            </h1>
+            <p class="text-gray-600 font-semibold text-lg">Catat & Ingat Jadwal Ganti Oli Motor Kesayanganmu!</p>
+        </header>
+
+        <!-- Area Manajemen Motor (Tab) -->
+        <div id="motor-tabs-container" class="flex flex-wrap gap-2 mb-6 fade-in items-center">
+            <!-- Tabs akan di-render dari JavaScript -->
+        </div>
+
+        <!-- Tombol Tambah Motor Baru -->
+        <div id="add-motor-section" class="mb-6 hidden fade-in">
+            <div class="bg-white p-4 rounded-2xl shadow-lg border-2 border-ceria-blue flex gap-2">
+                <input type="text" id="new-motor-name" placeholder="Nama Motor (Cth: Scoopy, Beat)" 
+                       class="flex-1 p-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:border-ceria-blue focus:ring-2 focus:ring-ceria-blue/30 text-lg">
+                <button onclick="saveNewMotor()" class="bg-ceria-blue hover:bg-blue-500 text-white font-bold py-3 px-6 rounded-xl transition shadow-md shadow-blue-200">
+                    Simpan
+                </button>
+                <button onclick="cancelAddMotor()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-3 px-4 rounded-xl transition">
+                    Batal
+                </button>
+            </div>
+        </div>
+
+        <!-- Area Konten Utama (Form dan Daftar Servis) -->
+        <div id="main-content" class="hidden fade-in">
+            
+            <!-- Form Tambah Catatan Servis -->
+            <div class="bg-white rounded-3xl p-6 shadow-xl shadow-yellow-100 border-t-4 border-t-ceria-yellow mb-8">
+                <h2 class="text-2xl font-bold text-gray-700 mb-4 flex items-center gap-2">
+                    ✨ Catat Servis Baru
+                </h2>
+                
+                <form id="service-form" class="space-y-4" onsubmit="saveServiceRecord(event)">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Jenis Servis -->
+                        <div>
+                            <label class="block text-sm font-bold text-gray-600 mb-1">Jenis Servis</label>
+                            <select id="service-type" required onchange="autoSetNextEstimates()"
+                                    class="w-full p-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:border-ceria-pink focus:ring-2 focus:ring-ceria-pink/30 text-lg cursor-pointer">
+                                <option value="Ganti Oli Mesin">🛢️ Ganti Oli Mesin</option>
+                                <option value="Ganti Oli Gardan">⚙️ Ganti Oli Gardan</option>
+                                <option value="Servis CVT/Rutin">🔧 Servis CVT / Rutin</option>
+                                <option value="Ganti Ban/Kampas">🛑 Ganti Ban / Kampas Rem</option>
+                                <option value="Lainnya">Lainnya...</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Catatan Opsional -->
+                        <div>
+                            <label class="block text-sm font-bold text-gray-600 mb-1">Catatan Tambahan (Oli Merk Apa?)</label>
+                            <input type="text" id="service-notes" placeholder="Cth: Oli MPX 2, Ganti Busi" 
+                                   class="w-full p-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:border-ceria-pink focus:ring-2 focus:ring-ceria-pink/30 text-lg">
+                        </div>
+
+                        <!-- Odometer Saat Ini -->
+                        <div>
+                            <label class="block text-sm font-bold text-gray-600 mb-1">Speedometer (KM) Saat Servis</label>
+                            <input type="number" id="current-km" placeholder="Cth: 12000" oninput="autoSetNextEstimates()"
+                                   class="w-full p-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:border-ceria-pink focus:ring-2 focus:ring-ceria-pink/30 text-lg">
+                        </div>
+
+                        <!-- Tanggal Servis (Sekarang) -->
+                        <div>
+                            <label class="block text-sm font-bold text-gray-600 mb-1">Tanggal Servis</label>
+                            <input type="date" id="service-date" required onchange="autoSetNextEstimates()"
+                                   class="w-full p-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:border-ceria-pink text-lg cursor-pointer">
+                        </div>
+
+                        <!-- Estimasi KM Berikutnya -->
+                        <div>
+                            <label class="block text-sm font-bold text-ceria-blue mb-1">Target KM Berikutnya</label>
+                            <input type="number" id="next-km" placeholder="Cth: 14000"
+                                   class="w-full p-3 rounded-xl bg-blue-50 border border-blue-200 focus:outline-none focus:border-ceria-blue text-lg font-bold text-blue-600">
+                            <p class="text-xs text-gray-500 mt-1">*Otomatis dihitung, bisa diubah.</p>
+                        </div>
+
+                        <!-- Perkiraan Servis Berikutnya -->
+                        <div>
+                            <label class="block text-sm font-bold text-ceria-pink mb-1">Tanggal Servis Berikutnya</label>
+                            <input type="date" id="next-service-date" required
+                                   class="w-full p-3 rounded-xl bg-red-50 border border-red-200 focus:outline-none focus:border-ceria-pink text-lg font-bold text-red-600 cursor-pointer">
+                            <p class="text-xs text-gray-500 mt-1">*Otomatis dihitung, bisa diubah.</p>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-ceria-green hover:bg-green-500 text-white font-bold py-4 rounded-xl text-lg transition shadow-lg shadow-green-200 mt-4">
+                        💾 Simpan Catatan Servis
+                    </button>
+                </form>
+            </div>
+
+            <!-- Daftar Riwayat Servis -->
+            <div>
+                <h3 class="text-xl font-bold text-gray-700 mb-4 px-2 border-l-4 border-ceria-blue">Riwayat & Pengingat</h3>
+                
+                <!-- Filter sederhana -->
+                <div class="flex gap-2 mb-4 px-2 overflow-x-auto pb-2" id="filter-container">
+                    <button onclick="filterRecords('Semua')" class="filter-btn active bg-gray-800 text-white px-4 py-1 rounded-full text-sm font-bold whitespace-nowrap">Semua</button>
+                    <button onclick="filterRecords('Ganti Oli Mesin')" class="filter-btn bg-white text-gray-600 border border-gray-300 px-4 py-1 rounded-full text-sm font-bold whitespace-nowrap">Oli Mesin</button>
+                    <button onclick="filterRecords('Ganti Oli Gardan')" class="filter-btn bg-white text-gray-600 border border-gray-300 px-4 py-1 rounded-full text-sm font-bold whitespace-nowrap">Oli Gardan</button>
+                </div>
+
+                <div id="records-list" class="space-y-4">
+                    <!-- Kartu riwayat akan dirender di sini oleh JavaScript -->
+                </div>
+                
+                <!-- Pesan kosong -->
+                <div id="empty-state" class="hidden text-center py-10 bg-white rounded-3xl shadow-sm border border-gray-100">
+                    <div class="text-5xl mb-3">👻</div>
+                    <p class="text-gray-500 font-semibold text-lg">Belum ada catatan servis untuk motor ini.</p>
+                    <p class="text-sm text-gray-400">Yuk, catat servis pertamamu di atas!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tombol Hapus Motor (Danger Zone) -->
+        <div id="danger-zone" class="mt-12 text-center hidden">
+            <button onclick="deleteActiveMotor()" class="text-sm text-red-400 hover:text-red-600 underline font-semibold transition">
+                Hapus Motor Ini
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- State Management ---
+        // Data akan disimpan dengan format: { motors: [ {id, name, records: []} ] }
+        let appData = JSON.parse(localStorage.getItem('bengkelData'));
+        
+        // Jika data belum ada sama sekali (pertama kali buka aplikasi)
+        // Langsung buatkan 2 slot motor default dan simpan ke localStorage
+        if (!appData || !appData.motors || appData.motors.length === 0) {
+            appData = {
+                motors: [
+                    { id: 1, name: 'Motor 1', records: [] },
+                    { id: 2, name: 'Motor 2', records: [] }
+                ]
+            };
+            localStorage.setItem('bengkelData', JSON.stringify(appData));
+        }
+
+        let activeMotorId = null;
+        let currentFilter = 'Semua';
+
+        // Set tanggal default ke hari ini
+        document.getElementById('service-date').valueAsDate = new Date();
+
+        // --- Inisialisasi Aplikasi ---
+        function initApp() {
+            if (appData.motors.length === 0) {
+                // Pencegahan error jika user secara tidak sengaja menghapus semua motor
+                appData.motors.push({ id: Date.now(), name: 'Motor 1', records: [] });
+                saveData();
+            }
+
+            // Pilih motor pertama sebagai default jika belum ada yang aktif
+            if (!activeMotorId || !appData.motors.find(m => m.id === activeMotorId)) {
+                activeMotorId = appData.motors[0].id;
+            }
+            
+            // Langsung tampilkan tabs dan konten utama (Beranda)
+            document.getElementById('add-motor-section').classList.add('hidden');
+            renderTabs();
+            renderMainContent();
+        }
+
+        // --- Fungsi Tab & Navigasi ---
+        function renderTabs() {
+            const container = document.getElementById('motor-tabs-container');
+            container.innerHTML = '';
+
+            appData.motors.forEach(motor => {
+                const isActive = motor.id === activeMotorId;
+                const btnClass = isActive 
+                    ? 'bg-ceria-pink text-white shadow-lg shadow-pink-200 border-2 border-ceria-pink scale-105 z-10' 
+                    : 'bg-white text-gray-600 border-2 border-gray-200 hover:border-ceria-pink hover:text-ceria-pink';
+                
+                const btn = document.createElement('button');
+                btn.className = `px-5 py-2.5 rounded-xl font-bold transition-all duration-200 ${btnClass}`;
+                btn.innerHTML = `🏍️ ${motor.name}`;
+                btn.onclick = () => {
+                    activeMotorId = motor.id;
+                    currentFilter = 'Semua'; // Reset filter saat ganti motor
+                    updateFilterButtonsUI();
+                    renderTabs();
+                    renderMainContent();
+                };
+                container.appendChild(btn);
+            });
+
+            // Tombol Tambah Motor (+). Ditampilkan sebagai tab terakhir.
+            const addBtn = document.createElement('button');
+            addBtn.className = `px-4 py-2.5 rounded-xl font-bold bg-white text-ceria-blue border-2 border-dashed border-ceria-blue hover:bg-blue-50 transition-all`;
+            addBtn.innerHTML = `+ Tambah Motor`;
+            addBtn.onclick = showAddMotorForm;
+            container.appendChild(addBtn);
+        }
+
+        function showAddMotorForm() {
+            document.getElementById('add-motor-section').classList.remove('hidden');
+            document.getElementById('new-motor-name').focus();
+        }
+
+        function cancelAddMotor() {
+            document.getElementById('add-motor-section').classList.add('hidden');
+            document.getElementById('new-motor-name').value = '';
+            if (appData.motors.length === 0) {
+                initApp();
+            }
+        }
+
+        function saveNewMotor() {
+            const nameInput = document.getElementById('new-motor-name');
+            const name = nameInput.value.trim();
+            if (!name) return;
+
+            const newMotor = {
+                id: Date.now(), // Generate ID unik
+                name: name,
+                records: []
+            };
+
+            appData.motors.push(newMotor);
+            activeMotorId = newMotor.id;
+            saveData();
+            
+            nameInput.value = '';
+            document.getElementById('add-motor-section').classList.add('hidden');
+            
+            initApp();
+        }
+
+        function deleteActiveMotor() {
+            if(confirm('Yakin ingin menghapus motor ini beserta seluruh catatan servisnya?')) {
+                appData.motors = appData.motors.filter(m => m.id !== activeMotorId);
+                activeMotorId = null;
+                saveData();
+                initApp();
+            }
+        }
+
+        // --- STREAMING_CHUNK: Menangani Logika Form & Perhitungan Waktu ---
+
+        // Menghitung otomatis tanggal dan KM servis berikutnya berdasarkan jenis servis
+        function autoSetNextEstimates() {
+            const type = document.getElementById('service-type').value;
+            const dateInput = document.getElementById('service-date').value;
+            const currentKmInput = document.getElementById('current-km').value;
+            
+            // --- Logika Tanggal ---
+            if(dateInput) {
+                let nextDate = new Date(dateInput);
+                
+                // Aturan sederhana perkiraan ganti tanggal
+                if (type === 'Ganti Oli Mesin') {
+                    nextDate.setMonth(nextDate.getMonth() + 2); // Oli mesin biasanya 2 bulan
+                } else if (type === 'Ganti Oli Gardan') {
+                    nextDate.setMonth(nextDate.getMonth() + 4); // Oli gardan 4 bulan
+                } else if (type === 'Servis CVT/Rutin') {
+                    nextDate.setMonth(nextDate.getMonth() + 4);
+                } else {
+                    nextDate.setMonth(nextDate.getMonth() + 3); // Default 3 bulan
+                }
+
+                // Format ke YYYY-MM-DD untuk input type="date"
+                const year = nextDate.getFullYear();
+                const month = String(nextDate.getMonth() + 1).padStart(2, '0');
+                const day = String(nextDate.getDate()).padStart(2, '0');
+                
+                document.getElementById('next-service-date').value = `${year}-${month}-${day}`;
+            }
+
+            // --- Logika Kilometer (KM) ---
+            if(currentKmInput) {
+                let nextKm = parseInt(currentKmInput);
+                
+                if (type === 'Ganti Oli Mesin') {
+                    nextKm += 2000; // Oli mesin tiap 2000 km
+                } else if (type === 'Ganti Oli Gardan') {
+                    nextKm += 8000; // Oli gardan tiap 8000 km
+                } else if (type === 'Servis CVT/Rutin') {
+                    nextKm += 8000;
+                } else {
+                    nextKm += 3000; // Default
+                }
+
+                document.getElementById('next-km').value = nextKm;
+            } else {
+                document.getElementById('next-km').value = '';
+            }
+        }
+
+        // Jalankan saat load untuk isi default perkiraan
+        window.addEventListener('DOMContentLoaded', () => {
+            if(document.getElementById('service-date').value) {
+                autoSetNextEstimates();
+            }
+        });
+
+        function saveServiceRecord(e) {
+            e.preventDefault();
+            
+            const type = document.getElementById('service-type').value;
+            const notes = document.getElementById('service-notes').value;
+            const currentKm = document.getElementById('current-km').value;
+            const nextKm = document.getElementById('next-km').value;
+            const date = document.getElementById('service-date').value;
+            const nextDate = document.getElementById('next-service-date').value;
+
+            const motorIndex = appData.motors.findIndex(m => m.id === activeMotorId);
+            if (motorIndex === -1) return;
+
+            const newRecord = {
+                id: Date.now(),
+                type,
+                notes,
+                currentKm,
+                nextKm,
+                date,
+                nextDate
+            };
+
+            // Tambahkan ke awal array agar yang terbaru muncul di atas
+            appData.motors[motorIndex].records.unshift(newRecord);
+            saveData();
+            
+            // Reset form sebagian
+            document.getElementById('service-notes').value = '';
+            document.getElementById('current-km').value = '';
+            document.getElementById('next-km').value = '';
+            
+            renderMainContent();
+            // Scroll sedikit ke area riwayat
+            document.getElementById('records-list').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function deleteRecord(recordId) {
+            if(confirm('Hapus catatan servis ini?')) {
+                const motorIndex = appData.motors.findIndex(m => m.id === activeMotorId);
+                appData.motors[motorIndex].records = appData.motors[motorIndex].records.filter(r => r.id !== recordId);
+                saveData();
+                renderMainContent();
+            }
+        }
+
+        // --- STREAMING_CHUNK: Menampilkan Data (Rendering UI) ---
+
+        function filterRecords(type) {
+            currentFilter = type;
+            updateFilterButtonsUI();
+            renderMainContent();
+        }
+
+        function updateFilterButtonsUI() {
+            const btns = document.querySelectorAll('.filter-btn');
+            btns.forEach(btn => {
+                if (btn.innerText.includes(currentFilter) || (currentFilter === 'Semua' && btn.innerText === 'Semua')) {
+                    btn.classList.replace('bg-white', 'bg-gray-800');
+                    btn.classList.replace('text-gray-600', 'text-white');
+                    btn.classList.remove('border', 'border-gray-300');
+                } else {
+                    btn.classList.replace('bg-gray-800', 'bg-white');
+                    btn.classList.replace('text-white', 'text-gray-600');
+                    btn.classList.add('border', 'border-gray-300');
+                }
+            });
+        }
+
+        function renderMainContent() {
+            document.getElementById('main-content').classList.remove('hidden');
+            document.getElementById('danger-zone').classList.remove('hidden');
+            
+            const motor = appData.motors.find(m => m.id === activeMotorId);
+            const listContainer = document.getElementById('records-list');
+            const emptyState = document.getElementById('empty-state');
+            
+            listContainer.innerHTML = '';
+            
+            // Terapkan filter
+            let recordsToRender = motor.records;
+            if (currentFilter !== 'Semua') {
+                recordsToRender = recordsToRender.filter(r => r.type === currentFilter);
+            }
+
+            if (recordsToRender.length === 0) {
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                
+                const today = new Date();
+                // Hilangkan jam/menit untuk perbandingan yang akurat
+                today.setHours(0,0,0,0);
+
+                recordsToRender.forEach(record => {
+                    const rDate = new Date(record.date);
+                    const nDate = new Date(record.nextDate);
+                    
+                    // Cek status apakah sudah jatuh tempo
+                    let statusColor = "bg-green-100 text-green-700";
+                    let statusIcon = "✅";
+                    let statusText = "Aman";
+                    
+                    const timeDiff = nDate.getTime() - today.getTime();
+                    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                    
+                    if (daysDiff < 0) {
+                        statusColor = "bg-red-100 text-red-700 animate-pulse";
+                        statusIcon = "🚨";
+                        statusText = "Waktunya Servis!";
+                    } else if (daysDiff <= 7) {
+                        statusColor = "bg-ceria-yellow text-yellow-800";
+                        statusIcon = "⚠️";
+                        statusText = `H-${daysDiff} Servis`;
+                    }
+
+                    // Format tanggal untuk tampilan (Cth: 12 Okt 2023)
+                    const formatOptions = { day: 'numeric', month: 'short', year: 'numeric' };
+                    const formattedDate = rDate.toLocaleDateString('id-ID', formatOptions);
+                    const formattedNextDate = nDate.toLocaleDateString('id-ID', formatOptions);
+
+                    // Menentukan ikon kartu berdasarkan tipe
+                    let cardIcon = "🔧";
+                    if(record.type.includes("Oli Mesin")) cardIcon = "🛢️";
+                    if(record.type.includes("Oli Gardan")) cardIcon = "⚙️";
+                    if(record.type.includes("Ban")) cardIcon = "🛑";
+
+                    // Format teks KM
+                    let kmInfo = '';
+                    if (record.currentKm) {
+                        kmInfo = `<div class="bg-blue-50 text-blue-700 px-3 py-2 rounded-xl text-sm font-bold mb-3 flex flex-wrap items-center gap-2 border border-blue-100 shadow-sm">
+                                    <span class="flex items-center gap-1">📍 ${Number(record.currentKm).toLocaleString('id-ID')} km</span>
+                                    ${record.nextKm ? `<span class="text-blue-300 hidden sm:inline">➔</span><span class="flex items-center gap-1">🎯 Target: ${Number(record.nextKm).toLocaleString('id-ID')} km</span>` : ''}
+                                  </div>`;
+                    }
+
+                    const card = document.createElement('div');
+                    card.className = "bg-white p-5 rounded-2xl shadow-sm border border-gray-100 relative fade-in";
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center text-2xl border border-gray-100 shadow-inner shrink-0">
+                                    ${cardIcon}
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-lg text-gray-800 leading-tight">${record.type}</h4>
+                                    <p class="text-gray-500 text-sm font-medium">📅 ${formattedDate}</p>
+                                </div>
+                            </div>
+                            <button onclick="deleteRecord(${record.id})" class="text-gray-300 hover:text-red-500 transition px-2">
+                                ✖
+                            </button>
+                        </div>
+                        
+                        ${kmInfo}
+
+                        ${record.notes ? `<div class="bg-gray-50 p-3 rounded-xl text-sm text-gray-600 mb-3 italic border border-gray-100">" ${record.notes} "</div>` : ''}
+                        
+                        <div class="mt-3 flex flex-col sm:flex-row sm:items-center justify-between border-t border-gray-100 pt-3 gap-2">
+                            <div>
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wide">Jadwal Berikutnya</p>
+                                <p class="font-bold text-gray-700 flex items-center gap-1">⏱️ ${formattedNextDate}</p>
+                            </div>
+                            <div class="${statusColor} px-3 py-1.5 rounded-full text-sm font-bold flex items-center justify-center gap-1 shadow-sm w-fit">
+                                ${statusIcon} ${statusText}
+                            </div>
+                        </div>
+                    `;
+                    listContainer.appendChild(card);
+                });
+            }
+        }
+
+        // --- Helper ---
+        function saveData() {
+            localStorage.setItem('bengkelData', JSON.stringify(appData));
+        }
+
+        // Jalankan aplikasi
+        initApp();
+    </script>
+</body>
+</html>
