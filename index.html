@@ -92,6 +92,11 @@
                                 <option value="Ganti Oli Gardan">⚙️ Ganti Oli Gardan</option>
                                 <option value="Servis CVT/Rutin">🔧 Servis CVT / Rutin</option>
                                 <option value="Ganti Ban/Kampas">🛑 Ganti Ban / Kampas Rem</option>
+                                <option value="Ganti Busi">⚡ Ganti Busi</option>
+                                <option value="Ganti Filter Udara">🌬️ Ganti Filter Udara</option>
+                                <option value="Ganti Air Radiator">💧 Ganti Air Radiator (Coolant)</option>
+                                <option value="Ganti Aki">🔋 Ganti Aki</option>
+                                <option value="Ganti V-Belt/Rantai">🔗 Ganti V-Belt / Rantai</option>
                                 <option value="Lainnya">Lainnya...</option>
                             </select>
                         </div>
@@ -115,6 +120,13 @@
                             <label class="block text-sm font-bold text-gray-600 mb-1">Tanggal Servis</label>
                             <input type="date" id="service-date" required onchange="autoSetNextEstimates()"
                                    class="w-full p-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:border-ceria-pink text-lg cursor-pointer">
+                        </div>
+
+                        <!-- Biaya Servis (Fitur Baru) -->
+                        <div>
+                            <label class="block text-sm font-bold text-green-600 mb-1">Biaya Servis (Rp) - Opsional</label>
+                            <input type="number" id="service-cost" placeholder="Cth: 75000"
+                                   class="w-full p-3 rounded-xl bg-green-50 border border-green-200 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-400/30 text-lg text-green-700 font-bold">
                         </div>
 
                         <!-- Estimasi KM Berikutnya -->
@@ -171,7 +183,38 @@
             </button>
         </div>
 
+        <!-- Fitur Baru: Backup & Restore Data -->
+        <div class="mt-8 bg-blue-50/50 p-4 rounded-3xl border border-blue-100 text-center flex flex-col items-center gap-3 fade-in max-w-md mx-auto shadow-sm">
+            <h4 class="text-sm font-bold text-gray-700">🛡️ Amankan Data Bengkelmu</h4>
+            <p class="text-xs text-gray-500 mb-1">Karena data disimpan di browser, yuk download backup sesekali agar catatanmu tidak hilang saat ganti HP!</p>
+            <div class="flex flex-wrap justify-center gap-2 w-full">
+                <button onclick="backupData()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2.5 px-4 rounded-xl shadow-md transition">
+                    ⬇️ Download Backup
+                </button>
+                <label class="flex-1 bg-gray-800 hover:bg-gray-900 text-white text-sm font-bold py-2.5 px-4 rounded-xl shadow-md transition cursor-pointer flex items-center justify-center gap-1">
+                    ⬆️ Pulihkan Data
+                    <input type="file" accept=".json" class="hidden" onchange="restoreData(event)">
+                </label>
+            </div>
+        </div>
+
     </div>
+
+    <!-- Footer / Watermark -->
+    <footer class="mt-12 pb-8 text-center w-full fade-in flex flex-col items-center gap-4">
+        <p class="text-gray-400 font-medium text-sm tracking-wide">
+            Powered by.<span class="font-bold text-ceria-blue text-base">Pakseh</span>
+        </p>
+        
+        <!-- Tombol WhatsApp Baru -->
+        <a href="https://wa.me/6285156028912" target="_blank" rel="noopener noreferrer" 
+           class="flex items-center gap-2 bg-green-50 hover:bg-green-100 text-green-600 px-5 py-2.5 rounded-full transition-all shadow-sm border border-green-200 w-fit cursor-pointer hover:scale-105">
+            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.398z"/>
+            </svg>
+            <span class="text-sm font-bold tracking-wide">Hubungi via WhatsApp</span>
+        </a>
+    </footer>
 
     <script>
         // --- State Management ---
@@ -305,10 +348,12 @@
                 // Aturan sederhana perkiraan ganti tanggal
                 if (type === 'Ganti Oli Mesin') {
                     nextDate.setMonth(nextDate.getMonth() + 2); // Oli mesin biasanya 2 bulan
-                } else if (type === 'Ganti Oli Gardan') {
-                    nextDate.setMonth(nextDate.getMonth() + 4); // Oli gardan 4 bulan
-                } else if (type === 'Servis CVT/Rutin') {
-                    nextDate.setMonth(nextDate.getMonth() + 4);
+                } else if (type === 'Ganti Oli Gardan' || type === 'Servis CVT/Rutin' || type === 'Ganti Busi') {
+                    nextDate.setMonth(nextDate.getMonth() + 4); // 4 bulan
+                } else if (type === 'Ganti Filter Udara' || type === 'Ganti Air Radiator' || type === 'Ganti Aki') {
+                    nextDate.setMonth(nextDate.getMonth() + 12); // Biasanya 1 tahun
+                } else if (type === 'Ganti V-Belt/Rantai') {
+                    nextDate.setMonth(nextDate.getMonth() + 18); // 1.5 tahun
                 } else {
                     nextDate.setMonth(nextDate.getMonth() + 3); // Default 3 bulan
                 }
@@ -327,10 +372,14 @@
                 
                 if (type === 'Ganti Oli Mesin') {
                     nextKm += 2000; // Oli mesin tiap 2000 km
-                } else if (type === 'Ganti Oli Gardan') {
-                    nextKm += 8000; // Oli gardan tiap 8000 km
-                } else if (type === 'Servis CVT/Rutin') {
-                    nextKm += 8000;
+                } else if (type === 'Ganti Oli Gardan' || type === 'Servis CVT/Rutin' || type === 'Ganti Busi') {
+                    nextKm += 8000; // Tiap 8000 km
+                } else if (type === 'Ganti Filter Udara' || type === 'Ganti Air Radiator') {
+                    nextKm += 12000; // Tiap 12000 km
+                } else if (type === 'Ganti Aki') {
+                    nextKm += 15000; // Tiap 15000 km
+                } else if (type === 'Ganti V-Belt/Rantai') {
+                    nextKm += 20000; // Tiap 20000 km (Sesuai anjuran pabrikan matic)
                 } else {
                     nextKm += 3000; // Default
                 }
@@ -357,6 +406,7 @@
             const nextKm = document.getElementById('next-km').value;
             const date = document.getElementById('service-date').value;
             const nextDate = document.getElementById('next-service-date').value;
+            const cost = document.getElementById('service-cost').value;
 
             const motorIndex = appData.motors.findIndex(m => m.id === activeMotorId);
             if (motorIndex === -1) return;
@@ -368,7 +418,8 @@
                 currentKm,
                 nextKm,
                 date,
-                nextDate
+                nextDate,
+                cost
             };
 
             // Tambahkan ke awal array agar yang terbaru muncul di atas
@@ -379,6 +430,7 @@
             document.getElementById('service-notes').value = '';
             document.getElementById('current-km').value = '';
             document.getElementById('next-km').value = '';
+            document.getElementById('service-cost').value = '';
             
             renderMainContent();
             // Scroll sedikit ke area riwayat
@@ -474,6 +526,11 @@
                     if(record.type.includes("Oli Mesin")) cardIcon = "🛢️";
                     if(record.type.includes("Oli Gardan")) cardIcon = "⚙️";
                     if(record.type.includes("Ban")) cardIcon = "🛑";
+                    if(record.type.includes("Busi")) cardIcon = "⚡";
+                    if(record.type.includes("Filter")) cardIcon = "🌬️";
+                    if(record.type.includes("Radiator")) cardIcon = "💧";
+                    if(record.type.includes("Aki")) cardIcon = "🔋";
+                    if(record.type.includes("V-Belt") || record.type.includes("Rantai")) cardIcon = "🔗";
 
                     // Format teks KM
                     let kmInfo = '';
@@ -482,6 +539,14 @@
                                     <span class="flex items-center gap-1">📍 ${Number(record.currentKm).toLocaleString('id-ID')} km</span>
                                     ${record.nextKm ? `<span class="text-blue-300 hidden sm:inline">➔</span><span class="flex items-center gap-1">🎯 Target: ${Number(record.nextKm).toLocaleString('id-ID')} km</span>` : ''}
                                   </div>`;
+                    }
+                    
+                    // Format Biaya Servis
+                    let costBadge = '';
+                    if (record.cost) {
+                        costBadge = `<div class="mt-1 bg-green-50 text-green-700 px-3 py-1.5 rounded-xl text-sm font-bold inline-flex items-center gap-1.5 border border-green-200">
+                                        💰 Rp ${Number(record.cost).toLocaleString('id-ID')}
+                                     </div>`;
                     }
 
                     const card = document.createElement('div');
@@ -504,7 +569,9 @@
                         
                         ${kmInfo}
 
-                        ${record.notes ? `<div class="bg-gray-50 p-3 rounded-xl text-sm text-gray-600 mb-3 italic border border-gray-100">" ${record.notes} "</div>` : ''}
+                        ${record.notes ? `<div class="bg-gray-50 p-3 rounded-xl text-sm text-gray-600 mb-2 italic border border-gray-100">" ${record.notes} "</div>` : ''}
+                        
+                        ${costBadge}
                         
                         <div class="mt-3 flex flex-col sm:flex-row sm:items-center justify-between border-t border-gray-100 pt-3 gap-2">
                             <div>
@@ -524,6 +591,41 @@
         // --- Helper ---
         function saveData() {
             localStorage.setItem('bengkelData', JSON.stringify(appData));
+        }
+
+        function backupData() {
+            const dataStr = JSON.stringify(appData);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            const exportFileDefaultName = 'Catatan_Servis_Motor_Backup.json';
+
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+
+        function restoreData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsedData = JSON.parse(e.target.result);
+                    if (parsedData && parsedData.motors) {
+                        appData = parsedData;
+                        saveData();
+                        alert('Data Bengkel berhasil dipulihkan!'); // Menggunakan alert sederhana sebagai notifikasi
+                        initApp();
+                    } else {
+                        alert('Oops! File yang dimasukkan tidak cocok dengan format aplikasi ini.');
+                    }
+                } catch (error) {
+                    alert('Gagal membaca file backup. Pastikan file tidak rusak.');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = ''; // Reset input agar bisa upload file yang sama lagi jika perlu
         }
 
         // Jalankan aplikasi
